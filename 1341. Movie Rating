@@ -94,15 +94,26 @@ Frozen 2 and Joker have a rating average of 3.5 in February but Frozen 2 is smal
 Solution
 */
 
-with base as 
-(
-    select mr.created_at, mr.rating, m.*,u.*
+ with base as (select mr.created_at, mr.rating, m.*,u.*
     from movierating mr left join movies m on mr.movie_id = m.movie_id
-    left join users u on mr.user_id = u.user_id
-),
-name as 
-(
-    select distinct base.name , count
-    from base group by 1 
+    left join users u on mr.user_id = u.user_id),
 
-)
+name as (
+    select name,count(rating) as cnt
+    from base
+    group by 1
+    order by 2 desc,1 asc limit 1),
+
+   title as(
+    select title, avg(rating) as rate
+    from base
+    where left(created_at,7)='2020-02'
+    group by 1
+    order by 2 desc, 1 asc limit 1)
+
+    select name as results
+    from name
+    union all
+    select title from title
+
+
